@@ -1,4 +1,3 @@
-
 // Tipos primitivos
 let ligado:boolean = true;
 let nome:string = "Ian Costa";
@@ -96,6 +95,7 @@ const bot1: robot = {
     id: "1",
     name: "megaman",
 }
+
 const bot2: robot2 = {
     id: "1",
     name: "megaman",
@@ -124,3 +124,112 @@ const p = new pessoa(1, "Costa");
 console.log(p.addToHello());
 
 
+// CLASSES
+/*
+    Data Modifiers
+      '-> pode-se fazer isso em propriedades e em métodos. 
+    public - passada a propriedade/método como defaut/padrão, podendo-se acessar fora da classe.
+    private - permite acesso as propriedades ou métodos apenas dentro da classe.
+    protected - permite acesso apenas na classe e em que herdar essa classe.
+*/
+class character {
+    private name?: string; // ? serve para dizer que a propriedade não é obrigatória 
+    protected stregth: number;
+    readonly skill: number; // readonly proibe modificação fora da classe
+
+    constructor(name: string, stregth: number, skill:number){
+        this.name = name;
+        this.stregth = stregth;
+        this.skill = skill;
+    }
+
+    attack(): void { //não retorna nada, apenas executa o que foi solicitado.
+        console.log(`Attack with ${this.stregth} points`);
+    }
+}
+
+class magician extends character {
+    magic: number;
+
+    constructor(name:string, stregth: number, skill:number, magic:number){
+        super(name, stregth, skill);
+        this.magic = magic;
+    }
+}
+
+const p1 = new character("Son Goku", 10, 98);
+const p2 = new magician("Natsu Dragneel", 6, 70, 300);
+p1.attack();
+console.log(p1);
+console.log(p2);
+// p1.skill = 39; // Dá erro pois skill é uma propriedade READONLY
+
+// GENERICS
+function concatArray<T>(...itens: T[]): T[]{
+    return new Array().concat(...itens);
+}
+
+const numArray = concatArray<number[]>([1,5], [3]);
+const stgArray = concatArray<string[]>(["felipe"], ["Son", "Vegeta"]);
+
+console.log(numArray);
+console.log(stgArray);
+
+
+// DECORATORS 
+function exibirNome(target:any) {
+    console.log(target);
+}
+
+@exibirNome
+class funcionario {}
+
+@exibirNome
+class srQuincas {}
+
+function apiVersion (version:string) {
+    return (target:any) => {
+        Object.assign(target.prototype, {__version: version, __name: "felipe"});
+    };
+}
+
+@apiVersion("1.10")
+class Api {}
+
+const api = new Api();
+console.log(api.__name);
+console.log(api.__version);;//para visualizar no terminal use: npm run start:dev
+
+// Decorator em Propriedades
+function minLength(length:number){
+    return (target:any, key:string) => {
+        let _value = target[key];    
+
+        const getter = () => "[play]" + _value;
+        const setter = (value: string) => {
+            if (value.length < length) {
+                throw new Error(`Tamanho menor que ${length}`);
+            } else {
+                _value = value;
+            }
+        };
+
+        Object.defineProperty(target, key, {
+            get: getter,
+            set: setter,
+        });
+
+    };
+};
+
+class forma {
+    @minLength(10)
+    name: string;
+
+    constructor(name:string){
+        this.name = name;
+    }
+}
+
+const formas = new forma("poadasdadasd");
+console.log(formas.name);
